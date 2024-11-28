@@ -1,0 +1,84 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <div class="logo" style="font-size: 50px;">User Management</div>
+    </nav>
+    <div class="container">
+        <h1>Manage Your Users</h1>
+        <section id="user-section">
+            <h2>User List</h2>
+            <div id="user-list" class="user-list">
+                <!-- Users will be listed here -->
+            </div>
+        </section>
+
+        <section id="add-user-section">
+            <h2>Add a New User</h2>
+            <form id="user-form">
+                <input type="text" id="name" placeholder="Enter Name" required>
+                <input type="email" id="email" placeholder="Enter Email" required>
+                <button type="submit">Add User</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        const apiUrl = 'http://localhost:3000/api/users';
+
+        // Fetch users and display them
+        function fetchUsers() {
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const userListDiv = document.getElementById('user-list');
+                    userListDiv.innerHTML = '';
+                    data.forEach(user => {
+                        userListDiv.innerHTML += `<div class="user-item">
+                            <p><strong>ID:</strong> ${user.id}</p>
+                            <p><strong>Name:</strong> ${user.name}</p>
+                            <p><strong>Email:</strong> ${user.email}</p>
+                        </div>`;
+                    });
+                })
+                .catch(err => console.log('Error fetching users:', err));
+        }
+
+        // Add a new user
+        document.getElementById('user-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            const userData = { name, email };
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('User added:', data);
+                fetchUsers();  // Refresh the user list after adding
+            })
+            .catch(err => console.log('Error adding user:', err));
+        });
+
+        // Initial fetch to load users
+        fetchUsers();
+    </script>
+</body>
+</html>
